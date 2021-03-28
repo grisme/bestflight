@@ -1,8 +1,6 @@
 import Foundation
 
-protocol CurrencySelectorViewOutput {
+protocol CurrencySelectorViewOutput: SelectorViewOutput {
     func viewIsReady()
-    func shouldRefresh()
     func didSelectCurrency(model: MarketCurrencyViewModel)
-    func didContinueButtonPress()
 }

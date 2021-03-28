@@ -1,11 +1,5 @@
 import Foundation
 
-protocol CountrySelectorViewInput: AlertPresentableView {
-    func setupInitialState()
-    func showLoading()
-    func hideLoading()
-    func endRefreshing()
+protocol CountrySelectorViewInput: SelectorViewInput, AlertPresentableView {
     func showItems(items: [MarketCountryViewModel])
-    func setContinueButtonEnabled()
-    func setContinueButtonDisabled()
 }

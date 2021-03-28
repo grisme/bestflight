@@ -1,8 +1,6 @@
 import Foundation
 
-protocol CountrySelectorViewOutput {
+protocol CountrySelectorViewOutput: SelectorViewOutput {
     func viewIsReady()
-    func shouldRefresh()
-    func didContinueButtonPress()
     func didSelectCountry(model: MarketCountryViewModel)
 }

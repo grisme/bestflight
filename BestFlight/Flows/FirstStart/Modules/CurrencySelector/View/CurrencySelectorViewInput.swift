@@ -1,11 +1,5 @@
 import Foundation
 
-protocol CurrencySelectorViewInput: AlertPresentableView {
-    func setupInitialState()
-    func showLoading()
-    func hideLoading()
-    func endRefreshing()
+protocol CurrencySelectorViewInput: SelectorViewInput, AlertPresentableView {
     func showItems(items: [MarketCurrencyViewModel])
-    func setContinueButtonEnabled()
-    func setContinueButtonDisabled()
 }

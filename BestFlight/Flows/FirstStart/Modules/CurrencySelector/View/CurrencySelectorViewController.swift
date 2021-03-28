@@ -1,68 +1,21 @@
 import UIKit
 
-// MARK: - CurrencySelectorViewController implementation 
+// MARK: - CurrencySelectorViewController implementation
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// TODO: Move button and tableview implementation onto some Base class
-// To prevent code doubling
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-final class CurrencySelectorViewController: UIViewController {
-
-    // MARK: Appearance
-
-    struct Appearance {
-        let backgroundColor: UIColor = .normalBackground
-        let continueInsets: UIEdgeInsets = .init(top: 8, left: 16, bottom: 8, right: 16)
-    }
-    private let appearance = Appearance()
+final class CurrencySelectorViewController: SelectorViewController {
 
     // MARK: Properties
 
     private let presenter: CurrencySelectorViewOutput
     private let textManager: CurrencySelectorTextManagerProtocol
-
     private var items: [MarketCurrencyViewModel] = []
 
-    // MARK: UI properties
-
-    private lazy var loaderView: LoaderView = {
-        let view = LoaderView(frame: .zero)
-        return view
-    }()
-
-    private lazy var refreshControl: UIRefreshControl = {
-        let refresh = UIRefreshControl(frame: .zero)
-        refresh.addTarget(self, action: #selector(shouldRefresh), for: .valueChanged)
-        return refresh
-    }()
-
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero)
-        tableView.refreshControl = refreshControl
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(cellClass: CurrencyTableViewCell.self)
-        return tableView
-    }()
-
-    private lazy var bottomContainer: UIView = {
-        UIView(frame: .zero)
-    }()
-
-    private lazy var continueButton: SimpleButton = {
-        let button = SimpleButton(frame: .zero)
-        button.addTarget(self, action: #selector(continueButtonPress), for: .touchUpInside)
-        button.isEnabled = false
-        return button
-    }()
-
-    // MARK: Life cycle
+    // MARK: Lifecycle
 
     init(presenter: CurrencySelectorViewOutput, textManager: CurrencySelectorTextManagerProtocol) {
         self.presenter = presenter
         self.textManager = textManager
-        super.init(nibName: nil, bundle: nil)
+        super.init(presenter: presenter)
     }
 
     required init?(coder: NSCoder) {
@@ -71,86 +24,23 @@ final class CurrencySelectorViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
         languageChanged()
         presenter.viewIsReady()
     }
 
-    private func setupUI() {
-        view.backgroundColor = appearance.backgroundColor
-        addSubviews()
-        makeConstraints()
-    }
-
-    private func addSubviews() {
-        view.addSubview(tableView)
-        view.addSubview(bottomContainer)
-        view.addSubview(loaderView)
-        bottomContainer.addSubview(continueButton)
-    }
-
-    private func makeConstraints() {
-        tableView.snp.makeConstraints { (make) in
-            make.topMargin.leading.trailing.equalToSuperview()
-            make.bottom.equalTo(bottomContainer.snp.top)
-        }
-        bottomContainer.snp.makeConstraints { (make) in
-            make.bottom.leading.trailing.equalToSuperview()
-        }
-        continueButton.snp.makeConstraints { (make) in
-            make.top.leading.trailing.equalToSuperview().inset(appearance.continueInsets)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(appearance.continueInsets)
-        }
-        loaderView.snp.makeConstraints { (make) in
-            make.center.equalToSuperview()
-            make.size.equalTo(LoaderView.defaultSize)
-        }
+    override func setupTableView(for tableView: UITableView) {
+        super.setupTableView(for: tableView)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(cellClass: CurrencyTableViewCell.self)
     }
 }
-
-// MARK: - Handlers
-
-private extension CurrencySelectorViewController {
-    @objc func continueButtonPress() {
-        presenter.didContinueButtonPress()
-    }
-
-    @objc func shouldRefresh() {
-        presenter.shouldRefresh()
-    }
-}
-
-// MARK: - CurrencySelectorViewInput implementation
 
 extension CurrencySelectorViewController: CurrencySelectorViewInput {
-    func setupInitialState() {
-    }
-
-    func showLoading() {
-        loaderView.startAnimating()
-    }
-
-    func hideLoading() {
-        loaderView.stopAnimating()
-    }
-
-    func endRefreshing() {
-        refreshControl.endRefreshing()
-    }
-
     func showItems(items: [MarketCurrencyViewModel]) {
         self.items = items
         tableView.reloadData()
-    }
-
-    func setContinueButtonEnabled() {
-        continueButton.isEnabled = true
-    }
-
-    func setContinueButtonDisabled() {
-        continueButton.isEnabled = false
-    }
-}
+    }}
 
 // MARK: - LanguageObservable implementation
 
